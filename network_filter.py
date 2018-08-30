@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 import os
 import sys
-from collections import defaultdict 
-from Bio import SeqIO
 import pickle
 import math
 import numpy as np 
-from Bio import pairwise2
-from Bio.pairwise2 import format_alignment
 from subgraph import *
 from graphviz import Graph
 class PROTEIN:
