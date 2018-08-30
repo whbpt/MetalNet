@@ -11,18 +11,18 @@ class PROTEIN:
 		self.contact_map=[]
 		self.metal_pair=[]
 		self.none_pair=[]
-		self.CH_pair=[]
+		self.CHED_pair=[]
 		self.prob=[]
 		self.site_dict={}
 		self.fulseq=str()
-CH_pair=['HH','HC','CH','CC','HD','DD','DH','CD','DC','EE','EC','CE','DE','ED','HE','EH']
+CHED_pair=['HH','HC','CH','CC','HD','DD','DH','CD','DC','EE','EC','CE','DE','ED','HE','EH']
 metal_list=["Calcium","Cobalt","Copper","Iron","Iron-sulfur","Magnesium","Manganese","Molybdenum","Nickel","Potassium","Sodium","Zinc"]
 hard_metal=["Calcium","Magnesium","Potassium","Sodium","Molybdenum"]
 soft_metal=["Cobalt","Copper","Iron","Iron-sulfur","Manganese","Nickel","Zinc","Other"]
-origin_seq='ARNDCQEGHILKMFPSTWYV-'
-new_seq='CHDENSTKGQYLAVRIMFWP-'
-new_seq2='CHDENQSTYWPGLAVIMFKR-'
 def transform_matrix(matrix):
+	origin_seq='ARNDCQEGHILKMFPSTWYV-'
+	new_seq='CHDENSTKGQYLAVRIMFWP-'
+	new_seq2='CHDENQSTYWPGLAVIMFKR-'
 	new_matrix=np.zeros((21,21))
 	for (i,line) in enumerate(matrix):
 		for (j,elem) in enumerate(line):
@@ -73,8 +73,6 @@ def loaddata():
 				validation.append((data1,metal_label))
 			elif classify_dict[gene]=="test":
 				test.append((data1,metal_label))
-		#else:
-		#	print(gene+" not in the list")
 	positive_samples=len(positive_list)
 	negative_list=open("data/negative_list",'r').readlines()
 	random.shuffle(negative_list)
@@ -92,10 +90,6 @@ def loaddata():
 					validation.append((data1,0))
 				elif classify_dict[gene]=="test":
 					test.append((data1,0))
-		#	else:
-		#		print(gene+" not in the list")
-		#else:
-		#	break
 	random.shuffle(train)
 	random.shuffle(validation)
 	random.shuffle(test)

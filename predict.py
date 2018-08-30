@@ -9,6 +9,7 @@ import pickle
 import sys
 import urllib
 import numpy as np
+from loaddata import transform_matrix
 ###################################################
 #the GREMLIN software has not been released yet, so please calculate the coevolution result on the online version
 #website: gremlin.bakerlab.org/submit.php
@@ -22,9 +23,13 @@ contact_file="test_data/input_"+input_ID+".con"
 msa_website="http://gremlin.bakerlab.org/sub_fasta.php?id="+input_ID
 contact_website="http://gremlin.bakerlab.org/sub_txt.php?db=SUB&id="+input_ID
 os.system("wget "+msa_website+" -O "+msa_file)
-newfile=urllib.urlopen(contact_website)
+newfile=urllib.urlopen(contact_website).read()
+if "ERROR" in newfile:
+	print(newfile)
+	print("the GREMLIN Result is being analyzed, please wait~~~~~~~~~~~~~~~~~~~~~~~~~")
+	sys.exit(1)
 filehandle=open(contact_file,'w')
-filehandle.write(newfile.read())
+filehandle.write(newfile)
 filehandle.close()
 ############################get the coevolution pair from .con file
 CHED_pair=['HH','HC','CH','CC','HD','DD','DH','CD','DC','EE','EC','CE','DE','ED','HE','EH']
@@ -61,9 +66,11 @@ seq_len=len(sequence)
 #########################predict the frequency matrix of each pair
 img_rows, img_cols = 21, 21
 model = load_model('models/contact_model.h5')
+output_file="test_data/output_"+input_ID+".cnn"
+output_handle=open(output_file,'w')
 for pair in coevolution_dict.keys():
 	data1=coevolution_dict[pair]/seq_num
-#	data1=data1+data1.T
+	data1=transform_matrix(data1)
 	x_prediction = data1.reshape(1, img_rows, img_cols, 1)
 	classes =model.predict(x_prediction,batch_size=1)
 	i_id=pair[0]
@@ -71,5 +78,11 @@ for pair in coevolution_dict.keys():
 	i_tag=i_id+"_"+origin_seq[int(i_id)-1]
 	j_tag=j_id+"_"+origin_seq[int(j_id)-1]
 	for i,num in enumerate(classes.argmax(axis=1)):
-		#if num==1:
-		print(i_tag,j_tag,num,classes[i][num])
+		if num==1:
+			print(i_tag,j_tag,num,classes[i][num])
+			output_handle.write(i_tag+"\t"+j_tag+"\t"+str(classes[i][num])+"\n")
+output_handle.close()
+
+
+
+
