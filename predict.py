@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import urllib
+#import urllib
 import keras
 from keras import backend as K
 import os
 from keras.models import load_model
 import pickle
 import sys
-import urllib
 import numpy as np
 from loaddata import transform_matrix
 ###################################################
@@ -21,16 +20,18 @@ input_ID=sys.argv[1]
 msa_file="test_data/input_"+input_ID+".msa"
 contact_file="test_data/input_"+input_ID+".con"
 msa_website="http://gremlin.bakerlab.org/sub_fasta.php?id="+input_ID
-contact_website="http://gremlin.bakerlab.org/sub_txt.php?db=SUB&id="+input_ID
+#contact_website="http://gremlin.bakerlab.org/sub_txt.php?db=SUB&id="+input_ID
+contact_website="http://gremlin.bakerlab.org/sub_txt.php?id="+input_ID
 os.system("wget "+msa_website+" -O "+msa_file)
-newfile=urllib.urlopen(contact_website).read()
-if "ERROR" in newfile:
-	print(newfile)
-	print("the GREMLIN Result is being analyzed, please wait~~~~~~~~~~~~~~~~~~~~~~~~~")
-	sys.exit(1)
-filehandle=open(contact_file,'w')
-filehandle.write(newfile)
-filehandle.close()
+os.system("wget "+contact_website+" -O "+contact_file)
+#newfile=urllib.urlopen(contact_website).read()
+#if "ERROR" in newfile:
+#	print(newfile)
+#	print("the GREMLIN Result is being analyzed, please wait~~~~~~~~~~~~~~~~~~~~~~~~~")
+#	sys.exit(1)
+#filehandle=open(contact_file,'w')
+#filehandle.write(newfile)
+#filehandle.close()
 ############################get the coevolution pair from .con file
 CHED_pair=['HH','HC','CH','CC','HD','DD','DH','CD','DC','EE','EC','CE','DE','ED','HE','EH']
 AA_dict={'A':0,'R':1,'N':2,'D':3,'C':4,'Q':5,'E':6,'G':7,'H':8,'I':9,'L':10,'K':11,'M':12,'F':13,'P':14,'S':15,'T':16,'W':17,'Y':18,'V':19,'-':20,'X':20,'U':20,'Z':20,'B':20,'J':20,'O':20}
