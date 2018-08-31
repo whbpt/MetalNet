@@ -5,7 +5,6 @@ import keras
 from keras import backend as K
 import os
 from keras.models import load_model
-import pickle
 import sys
 import numpy as np
 from loaddata import transform_matrix
@@ -24,11 +23,9 @@ msa_website="http://gremlin.bakerlab.org/sub_fasta.php?id="+input_ID
 contact_website="http://gremlin.bakerlab.org/sub_txt.php?id="+input_ID
 os.system("wget "+msa_website+" -O "+msa_file)
 os.system("wget "+contact_website+" -O "+contact_file)
-#newfile=urllib.urlopen(contact_website).read()
-#if "ERROR" in newfile:
-#	print(newfile)
-#	print("the GREMLIN Result is being analyzed, please wait~~~~~~~~~~~~~~~~~~~~~~~~~")
-#	sys.exit(1)
+if "ERROR" in open(contact_file,'r').readlines():
+	print("the GREMLIN Result is being analyzed, please wait~~~~~~~~~~~~~~~~~~~~~~~~~")
+	sys.exit(1)
 #filehandle=open(contact_file,'w')
 #filehandle.write(newfile)
 #filehandle.close()
@@ -83,7 +80,3 @@ for pair in coevolution_dict.keys():
 			print(i_tag,j_tag,num,classes[i][num])
 			output_handle.write(i_tag+"\t"+j_tag+"\t"+str(classes[i][num])+"\n")
 output_handle.close()
-
-
-
-
