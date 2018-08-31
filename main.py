@@ -1,36 +1,17 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import sys
-import argparse
 import keras
-import functools
-from itertools import product
 from keras import regularizers
-from keras.utils import plot_model
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
-from keras.layers import Conv3D, MaxPooling2D,Conv2D
-from keras import backend as K
-import os, random
+from keras.layers import MaxPooling2D,Conv2D
 import numpy as np
 import h5py
-from sklearn.datasets import make_classification
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, classification_report, confusion_matrix,average_precision_score
-from Bio.SubsMat.MatrixInfo import blosum62 as blosum
-import math
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 import pickle
 from loaddata import *
-def w_categorical_crossentropy(y_true, y_pred, weights):
-	nb_cl = len(weights)
-	final_mask = K.zeros_like(y_pred[:, 0])
-	y_pred_max = K.max(y_pred, axis=1)
-	y_pred_max = K.reshape(y_pred_max, (K.shape(y_pred)[0], 1))
-	y_pred_max_mat = K.cast(K.equal(y_pred, y_pred_max), K.floatx())
-	for c_p, c_t in product(range(nb_cl), range(nb_cl)):
-		final_mask += (weights[c_t, c_p] * y_pred_max_mat[:, c_p] * y_true[:, c_t])
-	return K.categorical_crossentropy(y_pred, y_true) * final_mask
 result=0
-for a in range(0,10):
+for a in range(0,1):
 	num_classes=2
 	(x_train,y_train,x_validation,y_validation,x_test,y_test)=loaddata()
 	img_rows, img_cols = 21, 21

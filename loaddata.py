@@ -2,8 +2,6 @@ from __future__ import print_function
 import pickle
 import numpy as np
 import random,math
-import os
-import sys
 class PROTEIN:
 	def __init__(self):
 		self.site=[]
