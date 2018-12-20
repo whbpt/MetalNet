@@ -4,11 +4,11 @@
 
 pip install keras numpy graphviz requests
 ## more 
-## for Ubuntu
+### for Ubuntu
 sudo apt-get install graphviz
-## for Centos
+### for Centos
 sudo yum install graphviz
-## for Opensuse
+### for Opensuse
 sudo zypper install graphviz
 # running script
 #############
