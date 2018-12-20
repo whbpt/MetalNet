@@ -4,7 +4,16 @@ import keras
 from keras import backend as K
 from keras.models import load_model
 import numpy as np
+import json
+import requests
+import sys
 from graphviz import Graph
+################
+import warnings
+warnings.filterwarnings("ignore")
+################
+
+#from graphviz import Graph
 
 ################ transfrom the matrix into a specific order
 ################, which related with metal binding orders
@@ -92,8 +101,6 @@ def subgraph(data):
 				if Node[k]!=-1 :
 					quence=np.append(quence,k)
 					Node[k]=-1
-		#for i in range(numnode-len(subField)):
-		#	subField.append(-1)
 		Branches.append(subField)
 	Branch_mtx=[]
 	for line in Branches:
@@ -140,8 +147,7 @@ def mtx2list(elem_list,adj_mtx):
 	return adj_list
 
 #####some helper function to transform the residue type into diffrent colors
-def color_def(residue):
-	elem=residue.split("_")[1]
+def color_def(elem):
 	if elem=="C":
 		color="#FFED97"
 	elif elem=="H":
@@ -151,8 +157,6 @@ def color_def(residue):
 	elif elem =="D":
 		color="#D3A4FF"
 	return color
-
-#####some helper function to transform the probablity into diffrent colors
 def color_digit(num):
 	if num>0.9:
 		color="#000000"
@@ -166,7 +170,6 @@ def color_digit(num):
 		color="#9D9D9D"
 	else:
 		color="#BEBEBE"
-	return color
 
 ######define a class that can store the results
 class PROTEIN:
@@ -174,33 +177,46 @@ class PROTEIN:
         self.site=[]
         self.metal_both=[]
         self.prob_dict={}
-###########################download the msa file and contact map file from website
-msa_file="examples/input_1535637622.msa"
-contact_file="examples/input_1535637622.con"
-############################get the coevolution pair from .con file
 ########a list than contains the combination of all the CHEDs.
 CHED_pair=['HH','HC','CH','CC','HD','DD','DH','CD','DC','EE','EC','CE','DE','ED','HE','EH']
 ##########transform the amino acid into number,the special amino acids are all treated with 20
 AA_dict={'A':0,'R':1,'N':2,'D':3,'C':4,'Q':5,'E':6,'G':7,'H':8,'I':9,'L':10,'K':11,'M':12,'F':13,'P':14,'S':15,'T':16,'W':17,'Y':18,'V':19,'-':20,'X':20,'U':20,'Z':20,'B':20,'J':20,'O':20}
 
 coevolution_dict=dict()
-contact_handle=open(contact_file,'r')
-contact_handle.readline()#discard the header
-for line in contact_handle:
-	line=line.strip()
-	i_id=line.split()[0]
-	j_id=line.split()[1]
-	i_res=line.split()[2].split("_")[1]
-	j_res=line.split()[3].split("_")[1]
-	pair=i_res+j_res
-	if pair in CHED_pair:
-		coevolution_dict[(i_id,j_id)]=np.zeros((21,21))
+input_ID = str(sys.argv[1])
+contact_handle = requests.get('https://gremlin2.bakerlab.org/preds_cst.php?db=SUB&id='+input_ID)
+for line in contact_handle.text.split("\n")[1:]:
+	line_list = line.split()
+	if len(line_list) == 9:
+		i_id = line_list[0]
+		j_id = line_list[1]
+		i_res = line_list[2]
+		j_res = line_list[3]
+		pair = i_res + j_res
+		if pair in CHED_pair:
+			coevolution_dict[(i_id,j_id)]=np.zeros((21,21))
 seq_num=0
-msa_handle=open(msa_file,'r').readlines()
-msa_handle="".join(msa_handle)#.split(">")
-origin_seq="".join(msa_handle.split(">")[1].split("\n")[1:])
-for line in msa_handle.split(">")[1:]:
-	sequence="".join(line.split("\n")[1:])
+# function for parsing FASTA file
+def parse_fasta(lines):
+	'''function to parse fasta'''
+	header = []
+	sequence = []
+	for line in lines:
+		if len(line) > 0:
+			if line[0] == ">":
+				header.append(line[1:])
+				sequence.append([])
+			else:
+				sequence[-1].append(line)
+	sequence = [''.join(seq) for seq in sequence]
+	return header, sequence
+
+msa_handle = requests.get('http://openseq.org/sub_fasta.php?id='+input_ID)
+msa_lines = msa_handle.text.split("\n")
+headers, sequences = parse_fasta(msa_lines)
+
+origin_seq = sequences[0]
+for sequence in sequences:
 	sequence=list(sequence)
 	seq_num+=1
 	for pair in coevolution_dict.keys():
@@ -220,14 +236,14 @@ for pair in coevolution_dict.keys():
 	data1=coevolution_dict[pair]/seq_num
 	data1=transform_matrix(data1)
 	x_prediction = data1.reshape(1, states, states, 1)
-	classes =model.predict(x_prediction,batch_size=1)
+	classes = model.predict(x_prediction,batch_size=1)
 	i_id=pair[0]
 	j_id=pair[1]
 	i_tag=i_id+"_"+origin_seq[int(i_id)-1]
 	j_tag=j_id+"_"+origin_seq[int(j_id)-1]
 	for i,num in enumerate(classes.argmax(axis=1)):
 		if num==1:
-			print(i_tag,j_tag,num,classes[i][num])
+			# print(i_tag,j_tag,num,classes[i][num])
 			Protein.metal_both.append((i_tag,j_tag))
 			if i_tag not in Protein.site:
 				Protein.site.append(i_tag)
@@ -235,6 +251,7 @@ for pair in coevolution_dict.keys():
 				Protein.site.append(j_tag)
 			Protein.prob_dict[(i_tag,j_tag)]=classes[i][num]
 
+render_file="test_data/output_"+input_ID+".render.gv"#network_filter
 dot = Graph(comment='The Round Table',format='png')
 flag=0
 temp_pair=list()
@@ -251,6 +268,7 @@ for (i,mtx) in enumerate(subgraph(new_matrix)):
 			for a in line:
 				temp_str=temp_str+" "+a
 			temp_str=temp_str+";"
+	#if True:
 		for pair in pair_list:
 			i_tag=pair[0]
 			j_tag=pair[1]
@@ -260,10 +278,10 @@ for (i,mtx) in enumerate(subgraph(new_matrix)):
 				prob=Protein.prob_dict[pair]				
 			except:
 				prob=Protein.prob_dict[(j_tag,i_tag)]				
-			dot.node(i_id,style="radial",fillcolor=color_def(i_tag))
-			dot.node(j_id,style="radial",fillcolor=color_def(j_tag))
+			dot.node(i_id,style="radial",fillcolor=color_def(i_tag.split("_")[1]))
+			dot.node(j_id,style="radial",fillcolor=color_def(i_tag.split("_")[1]))
 			dot.edge(i_id,j_id,penwidth="2",color=color_digit(float(prob)*2-1))
 			flag=1
 			temp_pair.append(pair)
 if flag>0:
-	dot.render("test_out", view=False)
+	dot.render(render_file, view=True)
