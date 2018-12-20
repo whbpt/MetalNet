@@ -17,11 +17,13 @@ sudo yum install graphviz
 sudo zypper install graphviz
 ```
 # running script
-submit your target sequence in this webserver\n
-http://gremlin.bakerlab.org/submit.php \n
-after finish this calculation, please use the ID number as the script input;\n
-for example, gremlin.bakerlab.org/submit.php&id=1535631343, the ID number is 1535631343\n
-run the command \n
+1. submit your target sequence in this webserver
+http://gremlin.bakerlab.org/submit.php 
+------------------
+2. after finish this calculation, please use the ID number as the script input;
+for example, gremlin.bakerlab.org/submit.php&id=1535631343, the ID number is 1535631343
+------------------
+- **3. run the python script**
 ```bash
 python predict.py 1535631343
 ```
