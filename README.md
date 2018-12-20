@@ -1,15 +1,16 @@
 # MetalNet
 
-#pre install
+# pre install
 
 pip install keras numpy graphviz requests
-##more 
-##for Ubuntu
+## more 
+## for Ubuntu
 sudo apt-get install graphviz
-##for Centos
+## for Centos
 sudo yum install graphviz
-##for Opensuse
+## for Opensuse
 sudo zypper install graphviz
+# running script
 #############
 submit your target sequence in this webserver
 http://gremlin.bakerlab.org/submit.php
