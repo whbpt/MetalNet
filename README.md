@@ -1,4 +1,7 @@
-# MetalNet
+# MetalNet : Bioinformatic algorithm for detecting metal binding sites 
+
+## You have just found MetalNet.
+MetalNet is designed for detecting metal binding sites with coevolution data. And metal binding sites and metal type will be offered if predicted.
 
 # installation
 
