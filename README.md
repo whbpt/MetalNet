@@ -3,8 +3,9 @@
 MetalNet is designed for detecting metal binding sites with coevolution data. And metal binding sites and metal type will be offered if predicted.
 
 # installation
-
+```bash
 pip install keras numpy graphviz requests networkx
+```
 ## one more step for graphviz 
 - **for Ubuntu**
 ```bash
