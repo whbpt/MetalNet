@@ -24,7 +24,7 @@ sudo zypper install graphviz
 **http://gremlin.bakerlab.org/submit.php**
 ------------------
 2. after finish this calculation, you will get a link such as, 
-**http://gremlin.bakerlab.org/submit.php&id=1535637622**
+**http://gremlin.bakerlab.org/sub.php?id=1535637622**
 ------------------
 3. remember to click the button,"**Import to GREMLIN BETA**".The ID number is 1535631343 (for example), and please use the ID number as the script input;
 ------------------ 
